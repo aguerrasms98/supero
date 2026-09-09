@@ -1,1 +1,16 @@
-ttty
+FTE_Actual = SUMX(
+    VALUES(HR[DipCode]),  -- Per ogni dipendente unico
+    VAR _PartTime = CALCULATE(MAX(HR[Part-Time]))  -- Prendo il suo Part-Time
+    --VAR _FTE = IF(_PartTime = 0, 1, DIVIDE(_PartTime, 100))  -- Converto in FTE
+    
+    VAR _GiorniPresenza = CALCULATE(COUNTROWS(HR))  -- Conto quanti giorni ha lavorato
+    VAR _FTE = DIVIDE ([HR_WorkingHours], 8*_GiorniPresenza)
+    VAR _GiorniLavorativi = 
+        CALCULATE(
+            COUNTROWS(Calendar),
+            Calendar[WorkingDay] = TRUE
+        )  -- Giorni lavorativi totali nel periodo
+    RETURN 
+        _FTE * DIVIDE(_GiorniPresenza, _GiorniLavorativi, 0)  -- FTE pesato per presenza
+)
+
