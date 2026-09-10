@@ -1,23 +1,9 @@
-FTE_Actual = 
-VAR _OreStandardGiornaliereFT = 7.7 -- Quante ore/giorno fa un Full-Time standard
-
--- Giorni lavorativi nel periodo selezionato (indipendente dal singolo dipendente)
-VAR _GiorniLavorativiPeriodo = 
-    CALCULATE(
-        COUNTROWS('Calendar'),
-        'Calendar'[WorkingDay] = TRUE(),
-        REMOVEFILTERS('Anagrafica')
+CountDipendenti = var datee = max('Calendar'[Date])
+return
+calculate(
+    DISTINCTCOUNT(RapportoLavoro[CodSoggetto]),
+    filter(
+        RapportoLavoro,
+        datee >= RapportoLavoro[DataInizioValidita] && datee <= RapportoLavoro[DataFineValidita]
     )
-
--- Ore teoriche che un Full-Time farebbe in questo periodo
-VAR _OreTeoricheFT_Periodo = _GiorniLavorativiPeriodo * _OreStandardGiornaliereFT
-
--- Ore effettivamente lavorate (somma presenze)
-VAR _OreLavorateReali = SUM(Presenze[OreLavorate])
-
-RETURN
-    DIVIDE(
-        _OreLavorateReali,
-        _OreTeoricheFT_Periodo,
-        0
-    )
+)
